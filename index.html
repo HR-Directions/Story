@@ -1,10 +1,10 @@
-
+```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title> Jabbar Market - Smart Store </title>
+    <title>Jabbar Market </title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -1084,7 +1084,8 @@
             if(validOrders.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-slate-400 font-bold">لا توجد طلبات</td></tr>'; return; }
             tbody.innerHTML = validOrders.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0)).map(o => `<tr class="hover:bg-slate-50"><td class="px-6 py-4"><span class="font-bold block text-slate-800">${o.id}</span><span class="text-xs text-slate-400">${o.date||'-'}</span></td><td class="px-6 py-4"><span class="block font-bold text-slate-800">${o.customer?.name||'-'}</span><span class="text-xs text-slate-500">${o.customer?.whatsapp||'-'}</span></td><td class="px-6 py-4 font-black text-slate-900">${o.total ? parseFloat(o.total).toFixed(2) : '0.00'}</td><td class="px-6 py-4"><select onchange="db.ref('orders/'+'${o.id}').update({status: this.value}).then(()=>showToast('تم التحديث','success'))" class="bg-white border border-slate-200 text-sm rounded-lg px-3 py-2 font-bold outline-none text-slate-600 shadow-sm focus:border-primary">${ORDER_STATUSES.map(st=>`<option value="${st}" ${(o.status||'قيد الانتظار')===st?'selected':''}>${st}</option>`).join('')}</select></td></tr>`).join(''); 
         }
-   // Admin Products & Pagination
+
+          // Admin Products & Pagination
         function populateAdminBrandFilter() { const select = document.getElementById('admin-brand-filter'); const currentVal = select.value; const filters = new Set(); Object.values(state.products).forEach(p => { if(p.brand) filters.add(p.brand); else if(p.category) filters.add(p.category); }); let html = '<option value="">كل المنتجات</option>'; Array.from(filters).sort().forEach(f => { html += `<option value="${f}">${f}</option>`; }); select.innerHTML = html; select.value = currentVal; }
         function renderAdminProducts(resetPage = false) { 
             if(resetPage) adminCurrentPage = 1;
@@ -1124,7 +1125,7 @@
         function toggleProductSelection(id, isCkd) { if(isCkd) state.selectedProducts.add(id); else { state.selectedProducts.delete(id); document.getElementById('select-all-cb').checked=false; } updateBulkPanel(); }
         function updateBulkPanel() { const p = document.getElementById('bulk-actions-panel'); const c = state.selectedProducts.size; document.getElementById('selected-count').innerText = c; c>0 ? p.classList.replace('hidden','flex') : p.classList.replace('flex','hidden'); }
         function bulkDeleteProducts() { if(!confirm(`حذف ${state.selectedProducts.size} منتج؟`)) return; const up = {}; state.selectedProducts.forEach(id=>up[id]=null); db.ref('products').update(up).then(()=>{ state.selectedProducts.clear(); document.getElementById('select-all-cb').checked=false; showToast('تم الحذف', 'success'); }); }
-
+        
         // Admin Add/Edit Product
         function openProductModal() { 
             document.getElementById('product-form').reset(); 
@@ -1162,8 +1163,9 @@
 
             const p = { id: document.getElementById('prod-id').value, code: document.getElementById('prod-code').value, name: document.getElementById('prod-name').value, price: parseFloat(document.getElementById('prod-price').value), category: document.getElementById('prod-category').value, brand: document.getElementById('prod-brand').value, images: imagesArray, desc: document.getElementById('prod-desc').value, isAvailable: isAvail }; 
             db.ref('products/' + p.id).set(p).then(() => { closeModal('product-modal'); showToast('تم الحفظ', 'success'); }); 
-
-            // --- Admin Brands Management ---
+        }
+        
+        // --- Admin Brands Management ---
         function populateBrandsDropdown() {
             const select = document.getElementById('brl-name'); 
             const brands = new Set(); 
@@ -1194,7 +1196,7 @@
             `).join('');
         }
 
-              // --- Banners ---
+        // --- Banners ---
         function populateBannerBrands() { const select = document.getElementById('ban-brand'); const brands = new Set(); Object.values(state.products).forEach(p => { if(p.brand) brands.add(p.brand.trim()); }); select.innerHTML = Array.from(brands).map(b => `<option value="${b}">${b}</option>`).join(''); if(brands.size === 0) select.innerHTML = '<option value="">يرجى إضافة منتجات ببراندات أولاً</option>'; }
         function saveBanner(e) { e.preventDefault(); const id = generateId('BAN'); const banner = { id: id, img: document.getElementById('ban-img').value, brand: document.getElementById('ban-brand').value }; if(!banner.brand) return showToast('يرجى تحديد البراند', 'error'); db.ref('banners/' + id).set(banner).then(() => { document.getElementById('banner-form').reset(); showToast('تم الحفظ', 'success'); }); }
         function deleteBanner(id) { if(confirm('تأكيد حذف البنر؟')) { db.ref('banners/' + id).remove().then(() => showToast('تم الحذف', 'success')); } }
@@ -1226,4 +1228,3 @@
     </script>
 </body>
 </html>
-        
